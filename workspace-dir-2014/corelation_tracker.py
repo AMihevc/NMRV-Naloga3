@@ -5,7 +5,6 @@ from ex2_utils import get_patch
 from ex3_utils import create_cosine_window, create_gauss_peak
 
 class MosseSimple(Tracker):
-
     def name(self):
         return "mosse_simple"
     
@@ -29,6 +28,7 @@ class MosseSimple(Tracker):
         return fouier_patch
     
     def make_filter(self, given_patch):
+        # this is the equation from instructions for filter H 
         return (self.fft_gaussian_peak * np.conj(given_patch)) / ((given_patch * np.conj(given_patch)) + self.lamda)
     
     def initialize(self, image, region): #initialize the tracker
@@ -37,11 +37,12 @@ class MosseSimple(Tracker):
         self.alpha = 0.15
         self.sigma = 2.0
         self.lamda = 0.1
+        # TODO change this params to find best results
 
         # define the region of interest
         self.position = (region[0] + region[2] / 2, region[1] + region[3] / 2)
 
-        # store original size
+        # store original size for better display of results 
         self.original_size = (round(region[2]), round(region[3]))
         # make sure the size is odd 
         if self.original_size[0] % 2 == 0:
@@ -49,7 +50,7 @@ class MosseSimple(Tracker):
         if self.original_size[1] % 2 == 0:
             self.original_size = (self.original_size[0], self.original_size[1] + 1)
        
-        # define the size with enlargement
+        # define the size with enlargement use this to calculate
         self.size = (round(region[2] * self.enlargment_factor), round(region[3] * self.enlargment_factor))
         # make sure the size is odd f
         if self.size[0] % 2 == 0:
@@ -61,8 +62,7 @@ class MosseSimple(Tracker):
         self.cosine_window = create_cosine_window(self.size)
 
         # define the gaussian peak
-        gaussian_peak = create_gauss_peak(self.size, self.sigma)
-        self.fft_gaussian_peak = np.fft.fft2(gaussian_peak)
+        self.fft_gaussian_peak = np.fft.fft2(create_gauss_peak(self.size, self.sigma))
 
         # get the patch
         self.patch = self.make_fft_patch(image)
@@ -79,12 +79,10 @@ class MosseSimple(Tracker):
         response = np.fft.ifft2(self.filter * fft_patch)
 
         # find the peak
-        # peak_y, peak_x  = np.unravel_index(np.argmax(response), response.shape) #is a tuple (y,x)
-        #alt version
         peak_y, peak_x = np.unravel_index(response.argmax(), response.shape) #is a tuple (y,x)
 
         # update the position
-        # from slides: 
+        # from slides (page 9): (so that the peak is top left corner of the patch because gaussian is inverted)
         if (peak_x > self.size[0] / 2):
             peak_x = peak_x - self.size[0]
 
@@ -92,13 +90,12 @@ class MosseSimple(Tracker):
             peak_y = peak_y - self.size[1]
 
         self.position = (self.position[0] + peak_x, self.position[1] + peak_y) # update
-        
-
+    
         # update the filter
-        new_patch = self.make_fft_patch(image)
-        self.filter = ((self.filter * (1 - self.alpha)) + self.make_filter(new_patch) * self.alpha) #TODO could be preattented
+        new_filter = self.make_filter(self.make_fft_patch(image))
+        self.filter = ((self.filter * (1 - self.alpha)) +  new_filter * self.alpha)
 
-        # return the new position as list
+        # return the new position
         return [self.position[0] - self.original_size[0] / 2, self.position[1] - self.original_size[1] / 2, self.original_size[0], self.original_size[1]]
 
 
