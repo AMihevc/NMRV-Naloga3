@@ -40,7 +40,7 @@ class MosseSimple(Tracker):
     def initialize(self, image, region): #initialize the tracker
         #parameters (majbe should be able to change them with arguments)
         self.enlargment_factor = 1.0
-        self.alpha = 0.2
+        self.alpha = 0.125
         self.sigma = 2.0
         self.lamda = 0.000001
 
@@ -80,7 +80,7 @@ class MosseSimple(Tracker):
         self.patch = self.make_fft_patch(image)
 
         # define the filter
-        self.filter = self.make_filter(self.patch)
+        self.filter = (self.fft_gaussian_peak * np.conj(self.patch)) / ((self.patch * np.conj(self.patch)) + self.lamda)
 
     
     def track(self, image): #track the object in the image
@@ -108,7 +108,7 @@ class MosseSimple(Tracker):
 
         # update the filter
         new_patch = self.make_fft_patch(image)
-        self.filter = (self.filter * (1 - self.alpha) + (self.make_filter(new_patch) * self.alpha)) 
+        self.filter = ((self.filter * (1 - self.alpha)) + ((self.fft_gaussian_peak * np.conj(new_patch)) / ((new_patch * np.conj(new_patch)) + self.lamda)) * self.alpha) #TODO could be preattented
 
         # return the new position as list
         return [self.position[0] - self.original_size[0] / 2, self.position[1] - self.original_size[1] / 2, self.original_size[0], self.original_size[1]]
