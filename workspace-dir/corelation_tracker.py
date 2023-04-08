@@ -35,14 +35,14 @@ class MosseSimple(Tracker):
         return patch
     
     def make_filter(self, given_patch):
-        return (self.fft_gaussian_peak * np.conj(given_patch)) / ((self.patch * np.conj(given_patch)) + self.lamda)
+        return (self.fft_gaussian_peak * np.conj(given_patch)) / ((given_patch * np.conj(given_patch)) + self.lamda)
     
     def initialize(self, image, region): #initialize the tracker
         #parameters (majbe should be able to change them with arguments)
-        self.enlargment_factor = 1.0
+        self.enlargment_factor = 1.25
         self.alpha = 0.125
         self.sigma = 2.0
-        self.lamda = 0.000001
+        self.lamda = 0.1
 
         # define the region of interest
         self.position = (region[0] + region[2] / 2, region[1] + region[3] / 2)
