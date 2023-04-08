@@ -10,37 +10,31 @@ class MosseSimple(Tracker):
         return "mosse_simple"
     
     def make_fft_patch(self, image):
+        
         # get the patch
         patch, crop_mask = get_patch(image, self.position, self.size)
-        # print(patch.shape)
-        # print(self.size)
 
+        # for debugging purposes
         if (patch.shape[0] != self.size[1] or patch.shape[1] != self.size[0]):
             print("Error: patch size is not correct")
             print("Patch shape:", patch.shape)
             print("Expected size:", self.size)
             print("Position:", self.position)
             print("Image shape:", image.shape)
-            #exit()
 
-        #convert to grayscale
-        patch = cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY)
-
-        # multiply with the cosine window
-        patch = np.multiply(self.cosine_window, patch)
-
-        # convert to frequency domain
-        patch = np.fft.fft2(patch)
+        patch = cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY) # convert to grayscale
+        patch = np.multiply(self.cosine_window, patch) # apply cosine window
+        fouier_patch = np.fft.fft2(patch) # convert to frequency domain FROM SLIDES
         
-        return patch
+        return fouier_patch
     
     def make_filter(self, given_patch):
         return (self.fft_gaussian_peak * np.conj(given_patch)) / ((given_patch * np.conj(given_patch)) + self.lamda)
     
     def initialize(self, image, region): #initialize the tracker
-        #parameters (majbe should be able to change them with arguments)
+        #parameters for the tracker
         self.enlargment_factor = 1.25
-        self.alpha = 0.125
+        self.alpha = 0.15
         self.sigma = 2.0
         self.lamda = 0.1
 
@@ -49,38 +43,32 @@ class MosseSimple(Tracker):
 
         # store original size
         self.original_size = (round(region[2]), round(region[3]))
-
-        # make sure the size is odd for the convolution
+        # make sure the size is odd 
         if self.original_size[0] % 2 == 0:
             self.original_size = (self.original_size[0] + 1, self.original_size[1])
         if self.original_size[1] % 2 == 0:
             self.original_size = (self.original_size[0], self.original_size[1] + 1)
        
-
         # define the size with enlargement
         self.size = (round(region[2] * self.enlargment_factor), round(region[3] * self.enlargment_factor))
-        # make sure the size is odd for the convolution
+        # make sure the size is odd f
         if self.size[0] % 2 == 0:
             self.size = (self.size[0] + 1, self.size[1])
         if self.size[1] % 2 == 0:
             self.size = (self.size[0], self.size[1] + 1)
-        # print("size:")
-        # print(self.size)
 
         # define the cosine window
         self.cosine_window = create_cosine_window(self.size)
-        # print("cosine window:")
-        # print(self.cosine_window.shape)
 
         # define the gaussian peak
-        self.gaussian_peak = create_gauss_peak(self.size, self.sigma)
-        self.fft_gaussian_peak = np.fft.fft2(self.gaussian_peak)
+        gaussian_peak = create_gauss_peak(self.size, self.sigma)
+        self.fft_gaussian_peak = np.fft.fft2(gaussian_peak)
 
         # get the patch
         self.patch = self.make_fft_patch(image)
 
         # define the filter
-        self.filter = (self.fft_gaussian_peak * np.conj(self.patch)) / ((self.patch * np.conj(self.patch)) + self.lamda)
+        self.filter = self.make_filter(self.patch)
 
     
     def track(self, image): #track the object in the image
@@ -91,11 +79,11 @@ class MosseSimple(Tracker):
         response = np.fft.ifft2(self.filter * fft_patch)
 
         # find the peak
-        peak_y, peak_x  = np.unravel_index(np.argmax(response), response.shape) #is a tuple (y,x)
+        # peak_y, peak_x  = np.unravel_index(np.argmax(response), response.shape) #is a tuple (y,x)
+        #alt version
+        peak_y, peak_x = np.unravel_index(response.argmax(), response.shape) #is a tuple (y,x)
 
         # update the position
-        # self.position = (self.position[0] + (peak[0] - self.size[0] / 2), self.position[1] + (peak[1] - self.size[1] / 2)) # this is the center of the patch
-        #Todo-Done check if this is correct from slides you might not need to subtract the size (it was not correct )
         # from slides: 
         if (peak_x > self.size[0] / 2):
             peak_x = peak_x - self.size[0]
@@ -103,12 +91,12 @@ class MosseSimple(Tracker):
         if (peak_y > self.size[1] / 2):
             peak_y = peak_y - self.size[1]
 
-        self.position = (self.position[0] + peak_x, self.position[1] + peak_y)
+        self.position = (self.position[0] + peak_x, self.position[1] + peak_y) # update
         
 
         # update the filter
         new_patch = self.make_fft_patch(image)
-        self.filter = ((self.filter * (1 - self.alpha)) + ((self.fft_gaussian_peak * np.conj(new_patch)) / ((new_patch * np.conj(new_patch)) + self.lamda)) * self.alpha) #TODO could be preattented
+        self.filter = ((self.filter * (1 - self.alpha)) + self.make_filter(new_patch) * self.alpha) #TODO could be preattented
 
         # return the new position as list
         return [self.position[0] - self.original_size[0] / 2, self.position[1] - self.original_size[1] / 2, self.original_size[0], self.original_size[1]]
