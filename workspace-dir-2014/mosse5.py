@@ -4,9 +4,9 @@ from utils.tracker import Tracker
 from ex2_utils import get_patch
 from ex3_utils import create_cosine_window, create_gauss_peak
 
-class MosseSimple(Tracker):
+class MosseSimple5(Tracker):
     def name(self):
-        return "mosse_simple"
+        return "mosse5"
     
     def make_fft_patch(self, image):
         
@@ -33,8 +33,8 @@ class MosseSimple(Tracker):
     
     def initialize(self, image, region): #initialize the tracker
         #parameters for the tracker
-        self.enlargment_factor = 1.0
-        self.alpha = 0.005
+        self.enlargment_factor = 2.0
+        self.alpha = 0.2
         self.sigma = 2.0
         self.lamda = 0.000001
         # TODO change this params to find best results

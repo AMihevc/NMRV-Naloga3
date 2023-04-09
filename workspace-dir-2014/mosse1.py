@@ -4,9 +4,9 @@ from utils.tracker import Tracker
 from ex2_utils import get_patch
 from ex3_utils import create_cosine_window, create_gauss_peak
 
-class MosseSimple(Tracker):
+class MosseSimple1(Tracker):
     def name(self):
-        return "mosse_simple"
+        return "mosse1"
     
     def make_fft_patch(self, image):
         
@@ -34,7 +34,7 @@ class MosseSimple(Tracker):
     def initialize(self, image, region): #initialize the tracker
         #parameters for the tracker
         self.enlargment_factor = 1.0
-        self.alpha = 0.005
+        self.alpha = 0.2
         self.sigma = 2.0
         self.lamda = 0.000001
         # TODO change this params to find best results
@@ -98,48 +98,3 @@ class MosseSimple(Tracker):
         # return the new position
         return [self.position[0] - self.original_size[0] / 2, self.position[1] - self.original_size[1] / 2, self.original_size[0], self.original_size[1]]
     
-
-# class MosseSimple1(MosseSimple):
-#     def __init__(self):
-#         super().__init__()
-#         self.enlargment_factor = 1.0
-#         self.alpha = 0.15
-#         self.sigma = 2.0
-#         self.lamda = 0.000001
-
-#     def name(self):
-#         return f"mosse_tracker_{self.enlargment_factor}_{self.alpha}_{self.sigma}_{self.lamda}"
-    
-# class MosseSimple2(MosseSimple):
-#     def __init__(self):
-#         super().__init__()
-#         self.enlargment_factor = 1.0
-#         self.alpha = 0.15
-#         self.sigma = 2.0
-#         self.lamda = 0.000001
-
-#     def name(self):
-#         return f"mosse_tracker_{self.enlargment_factor}_{self.alpha}_{self.sigma}_{self.lamda}"
-    
-# class MosseSimple3(MosseSimple):
-#     def __init__(self):
-#         super().__init__()
-#         self.enlargment_factor = 1.0
-#         self.alpha = 0.15
-#         self.sigma = 2.0
-#         self.lamda = 0.000001
-
-#     def name(self):
-#         return f"mosse_tracker_{self.enlargment_factor}_{self.alpha}_{self.sigma}_{self.lamda}"
-    
-
-# class MosseSimple4(MosseSimple):
-#     def __init__(self):
-#         super().__init__()
-#         self.enlargment_factor = 1.0
-#         self.alpha = 0.15
-#         self.sigma = 2.0
-#         self.lamda = 0.000001
-
-#     def name(self):
-#         return f"mosse_tracker_{self.enlargment_factor}_{self.alpha}_{self.sigma}_{self.lamda}"
