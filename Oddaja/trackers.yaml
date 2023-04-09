@@ -1,0 +1,31 @@
+---
+# tracker_test:  # use tracker identifier as you want to call your tracker from terminal
+#   tracker_path: TODO: insert-path  # path to the Python script with your tracker
+#   class_name: TODO: insert-class-name  # class name of your tracker
+#   paths:  # optionally: additional Python paths you want to include
+#     - insert\path\1
+#     - insert\path\2 ...
+
+mosse_simple_tracker: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\corelation_tracker.py # path to the Python script with your tracker
+    class_name: MosseSimple # class name of your tracker
+
+mosse1: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\mosse1.py # path to the Python script with your tracker
+    class_name: MosseSimple1 # class name of your tracker
+
+mosse2: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\mosse2.py # path to the Python script with your tracker
+    class_name: MosseSimple2 # class name of your tracker
+
+mosse3: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\mosse3.py # path to the Python script with your tracker
+    class_name: MosseSimple3 # class name of your tracker
+
+mosse4: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\mosse4.py # path to the Python script with your tracker
+    class_name: MosseSimple4 # class name of your tracker
+
+mosse5: # use tracker identifier as you want to call your tracker from terminal
+    tracker_path: C:\Users\am8130\Documents\Faks\2.semester\NMRV\3.naloga\NMRV-Naloga3\workspace-dir-2014\mosse5.py # path to the Python script with your tracker
+    class_name: MosseSimple5 # class name of your tracker
